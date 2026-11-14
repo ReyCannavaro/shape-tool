@@ -1,15 +1,13 @@
 'use client';
 
-import React, { useRef } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import React from 'react';
 import { useQuizEngine } from '@/hooks/useQuizEngine';
-import { useAudioEffects } from '@/hooks/useAudioEffects';
 import LandingView from '@/components/LandingView';
 import QuestionView from '@/components/QuestionView';
 import LoadingView from '@/components/LoadingView';
 import ResultView from '@/components/ResultView';
 import QuizErrorBoundary from '@/components/QuizErrorBoundary';
-import type { OptionKey } from '@/types/quiz';
+import { GitBranch, FolderGit2 } from 'lucide-react';
 
 export default function QuizApp() {
   const {
@@ -26,113 +24,53 @@ export default function QuizApp() {
     isFirstQuestion,
   } = useQuizEngine();
 
-  const { playClick, playSelect, playVictory } = useAudioEffects();
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleStart = () => {
-    playClick();
-    startQuiz();
-  };
-
-  const handleOptionSelect = (key: OptionKey) => {
-    playSelect();
-    selectOption(key);
-  };
-
-  const handleBack = () => {
-    playClick();
-    previousQuestion();
-  };
-
-  const handleRestart = () => {
-    playClick();
-    restartQuiz();
-  };
-
   return (
     <QuizErrorBoundary>
-      <div
-        ref={containerRef}
-        className="relative flex min-h-screen w-full flex-col items-center justify-between overflow-x-hidden bg-[#001433] px-4 py-6 sm:px-6 md:py-10"
-      >
-        {/* Ambient Radial Cyber Glows */}
-        <div className="pointer-events-none absolute -top-40 left-1/2 -z-10 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-[#002C6C]/40 blur-[120px]" />
-        <div className="pointer-events-none absolute -bottom-40 right-10 -z-10 h-[400px] w-[400px] rounded-full bg-[#00E5FF]/10 blur-[140px]" />
-        <div className="pointer-events-none absolute top-1/2 left-10 -z-10 h-[350px] w-[350px] -translate-y-1/2 rounded-full bg-[#FFB800]/5 blur-[100px]" />
-
-        {/* Main Kiosk Content Container */}
-        <div className="flex w-full max-w-xl flex-1 flex-col justify-center">
-          <AnimatePresence mode="wait">
-            {state === 'LANDING' && (
-              <motion.div
-                key="landing"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -16 }}
-                transition={{ duration: 0.3 }}
-              >
-                <LandingView onStart={handleStart} />
-              </motion.div>
-            )}
-
-            {state === 'QUESTION' && (
-              <motion.div
-                key={`question-${currentQuestion.id}`}
-                initial={{ opacity: 0, x: 24 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -24 }}
-                transition={{ duration: 0.25 }}
-              >
-                <QuestionView
-                  question={currentQuestion}
-                  currentIndex={currentQuestionIndex}
-                  totalQuestions={totalQuestions}
-                  selectedKey={answers[currentQuestion.id]}
-                  onSelectOption={handleOptionSelect}
-                  onBack={handleBack}
-                  isFirstQuestion={isFirstQuestion}
-                />
-              </motion.div>
-            )}
-
-            {state === 'LOADING' && (
-              <motion.div
-                key="loading"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.05 }}
-                transition={{ duration: 0.35 }}
-              >
-                <LoadingView />
-              </motion.div>
-            )}
-
-            {state === 'RESULT' && result && (
-              <motion.div
-                key="result"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-              >
-                <ResultView
-                  result={result}
-                  onRestart={handleRestart}
-                  onVictoryMount={playVictory}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+      <div className="relative flex min-h-screen w-full flex-col items-center justify-between overflow-x-hidden bg-[#001433] px-4 py-6 sm:px-6 md:py-8">
+        {/* Development & Scaffold Header Ribbon */}
+        <div className="w-full max-w-2xl mb-6 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/10 bg-[#001F4D]/80 px-4 py-2 text-xs font-mono backdrop-blur-md">
+          <div className="flex items-center gap-2 text-[#00E5FF]">
+            <FolderGit2 className="h-4 w-4" />
+            <span>shape-tool / src/components/</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1 text-[#FFB800]">
+              <GitBranch className="h-3.5 w-3.5" />
+              <span>dev</span>
+            </span>
+            <span className="rounded bg-white/10 px-2 py-0.5 text-white/80">
+              STATE: <strong className="text-[#00E5FF]">{state}</strong>
+            </span>
+          </div>
         </div>
 
-        {/* Persistent Booth Branding Footer */}
-        <footer className="mt-8 flex flex-col items-center gap-1 text-center text-xs text-white/50">
-          <p className="font-mono tracking-wider text-[#00E5FF]">
-            ITS OPEN CAMPUS 2026 • BOOTH SHAPETOOL
-          </p>
-          <p className="text-white/40">
-            Institut Teknologi Sepuluh Nopember • Surabaya, Jawa Timur
-          </p>
+        {/* Dynamic View Placeholder Renderer */}
+        <div className="flex w-full max-w-xl flex-1 flex-col justify-center">
+          {state === 'LANDING' && <LandingView onStart={startQuiz} />}
+
+          {state === 'QUESTION' && (
+            <QuestionView
+              question={currentQuestion}
+              currentIndex={currentQuestionIndex}
+              totalQuestions={totalQuestions}
+              selectedKey={answers[currentQuestion.id]}
+              onSelectOption={selectOption}
+              onBack={previousQuestion}
+              isFirstQuestion={isFirstQuestion}
+            />
+          )}
+
+          {state === 'LOADING' && <LoadingView />}
+
+          {state === 'RESULT' && result && (
+            <ResultView result={result} onRestart={restartQuiz} />
+          )}
+        </div>
+
+        {/* Footer */}
+        <footer className="mt-8 flex flex-col items-center gap-1 text-center text-xs text-white/40 font-mono">
+          <p>ITS EXPO 2026 • BOOTH SHAPETOOL MAGAZINE VOL. 12</p>
+          <p className="text-[10px]">Folder Structure & Scaffolding Phase — Branch: dev</p>
         </footer>
       </div>
     </QuizErrorBoundary>
